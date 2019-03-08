@@ -2,7 +2,7 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import re
-x=[0]
+x=[]
 y=[]
 
 def generateGraph(reading_count_priv, time_interval_priv):
@@ -10,7 +10,7 @@ def generateGraph(reading_count_priv, time_interval_priv):
   global time_interval
   reading_count = reading_count_priv
   time_interval = time_interval_priv
-  for count in range(1, reading_count_priv):
+  for count in range(0, reading_count_priv):
     x.append(count * time_interval_priv)
   print('Generating graph')
   produceGraph()
