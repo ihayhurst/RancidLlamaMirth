@@ -16,7 +16,7 @@ It evolved to be quite good a slicing and dicing the log to produce data fron di
 or tailing the last [-l] number of lines of the log
 
 python3 graph.py --help
-
+```
 usage: Graph.py charts range of times from a temperature log
        [-h] [-l LINES] [-s START] [-e END] [-d DUR]
 
@@ -28,3 +28,4 @@ optional arguments:
                         Start date YYYY/MM/DD-HH:MM
   -e END, --end END     End date YYYY/MM/DD-HH:MM
   -d DUR, --dur DUR     Duration: Hours, Days, Weeks, e.g. 2W for 2 weeks
+```
