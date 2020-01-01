@@ -6,41 +6,72 @@ import matplotlib.dates as mdates
 from scipy.interpolate import make_interp_spline, BSpline
 import numpy as np
 import sys, argparse, re, datetime
+import config
 
 DT_FORMAT       = '%Y/%m/%d-%H:%M'
-LOG_DT_FORMAT   = '%a %b %d %H:%M:%S %Y'
+LOG_DT_FORMAT = config.log_date_format
+area_name = config.area_name 
 
-def generateGraph(reading_count):
+def generateGraph(reading_count, area_name):
     '''Wrapper for drawgraph called from '''
     kwargs = {'tailmode' : True}
     args   = {reading_count}
-    x, y   = readValues(*args, **kwargs)
-    if x == '':
+    if len(open('hpt.log', encoding="utf-8").readlines(  )) < reading_count:
       print('Not enough lines in logfile, aborting\n')
+      plt.figure()
+      plt.savefig('hpt.png')
+      plt.clf()
+      plt.close('all')
       return
-    drawGraph(x,y)
+    x, y, h, p   = readValues(*args, **kwargs)
+    drawGraph(x,y,h,p, area_name)
 
-def drawGraph(x,y):
+def drawGraph(x,y,h,p, area_name):
     x2 = mdates.date2num(x)
     x_sm = np.array(x2)
-    y_sm = np.array(y)
     x_smooth = np.linspace(x_sm.min(), x_sm.max(), 200)
     spl = make_interp_spline(x2, y, k=3)
+    spl_h = make_interp_spline(x2, h, k=3)
+    spl_p = make_interp_spline(x2, p, k=3)
     y_smooth = spl(x_smooth)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b-%d %H:%M'))
+    h_smooth = spl_h(x_smooth)
+    p_smooth = spl_p(x_smooth)
 
-    plt.grid(b=True, which='major', axis='both', color='black')
+    fig, ax = plt.subplots(figsize=(10, 6))
+    fig.subplots_adjust(right=0.75)
+    fig.autofmt_xdate()
+    hh = ax.twinx()
+    pp = ax.twinx()
+
+    ax.grid(which='major', axis='x', color='grey')
+    hh.spines["right"].set_position(("axes", 1.2))
+
     plt.plot([],[])
     x_smooth_dt = mdates.num2date(x_smooth)
-    plt.plot(x_smooth_dt, y_smooth, 'red', linewidth=1)
-    plt.gcf().autofmt_xdate()
+    #ax.xaxis.set_major_formatter(mdates.DateFormatter('%b-%d %H:%M'))
+    maFmt = mdates.DateFormatter('%b-d')
+    miFmt = mdates.DateFormatter('%H-%M')
+    ax.xaxis.set_major_formatter(maFmt)
+    ax.xaxis.set_minor_formatter(miFmt)
+    for label in ax.xaxis.get_minorticklabels()[::2]: # show every other minor label
+        label.set_visible(False)
+    ax.tick_params(axis='both', which='major', labelsize=10)
+
     plt.xlabel('Time (Month-Day - Hour: Minutes)')
-    plt.ylabel('Temperature \u2103')
-    plt.title('Room Temperature logged by Pi')
+    temperature_color = 'tab:red'
+    humidity_color    = 'tab:green'
+    pressure_color    = 'tab:blue'
+    ax.set_ylabel('Temperature \u2103', color=temperature_color)
+    hh.set_ylabel('Humidity %',         color=humidity_color)
+    pp.set_ylabel('Pressure mBar',      color=pressure_color)
+    ax.plot(x_smooth_dt, y_smooth, color=temperature_color, linewidth=1)
+    hh.plot(x_smooth_dt, h_smooth, color=humidity_color, linewidth=1)
+    pp.plot(x_smooth_dt, p_smooth, color=pressure_color, linewidth=1)
+    plt.title(str(area_name) + ' Temperature, Humidity and Pressure logged by Pi')
     plt.savefig('graph.png')
     print('Created graph\n')
     plt.clf()
+    plt.close('all')
 
 def readValues(*args, **kwargs):
     '''for key, value in kwargs.items():     #Debug
@@ -54,12 +85,17 @@ def readValues(*args, **kwargs):
     else:
         reading_count = args[0]
 
-    log_dt_format = '%a %b %d %H:%M:%S %Y'
+    log_dt_format = LOG_DT_FORMAT
 
-    x=[]
-    y=[]
+    x=[] #Datetime
+    y=[] #Temperature
+    h=[] #Humidity 
+    p=[] #Presure
     x.clear()
     y.clear()
+    h.clear()
+    p.clear()
+
     try:
         tailmode = kwargs.get('tailmode')
     except:
@@ -68,26 +104,30 @@ def readValues(*args, **kwargs):
         from_dt = date_to_dt(kwargs.get('from_date'),DT_FORMAT)
         to_dt = date_to_dt(kwargs.get('to_date'),DT_FORMAT)
 
-    with open('temps.log', 'r') as f:
+    with open('hpt.log', 'r', encoding="utf-8") as f:
         if tailmode:
             taildata = f.readlines() [-reading_count:]
         else:
             taildata = f.readlines()
         for line in taildata:
-            data = re.split("\[(.*?)\]", line)
-            if len(data) !=3: continue #ignore lines that don't have 3 elements
-            temp = re.findall("[-]?\d+\.\d+", data[2])
-            temp = float(temp[0])
-            dt = date_to_dt(data[1], LOG_DT_FORMAT)
+            line = line.translate({ord(i): None for i in '[]'})
+            data = re.split(" ", line)
+            temp, humidity, pressure =  float(data[2]), float(data[3]), float(data[4])
+            #print(f'Temp: {temp} Humidity:{humidity} Pressure:{pressure}\n')
+            dt = str(data[0])+" "+str(data[1])
+            dt = date_to_dt(dt, LOG_DT_FORMAT)
             if tailmode:
                 x.append(dt)
                 y.append(temp)
+                h.append(humidity)
+                p.append(pressure)
             else:
                 if (dt >= from_dt) and (dt <= to_dt):
                     x.append(dt)
                     y.append(temp)
-
-        return x,y
+                    h.append(humidity)
+                    p.append(pressure)
+        return x,y,h,p
 
 def cmd_args(args=None):
     parser = argparse.ArgumentParser("Graph.py charts range of times from a temperature log")
@@ -191,8 +231,8 @@ def main(args=None):
         kwargs={'tailmode': False, 'from_date': opt.start, 'to_date': opt.end, **kwargs}
 
 
-    x, y  = readValues(*args, **kwargs)
-    drawGraph(x,y)
+    x, y, h, p  = readValues(*args, **kwargs)
+    drawGraph(x,y,h,p, area_name)
     sys.exit(1)
 
 if __name__ == '__main__':
