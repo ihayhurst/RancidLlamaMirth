@@ -2,14 +2,14 @@
 Python parse date log slice dice date range, graph data
 
 Graph.py was written to display a graph from a temperature log https://github.com/Dragon8oy/temp-report
+
 ```
-[Fri May 17 20:04:02 2019] Temperature: 16.5°C
-[Fri May 17 20:09:03 2019] Temperature: 16.375°C
-[Fri May 17 20:14:03 2019] Temperature: 16.312°C
-[Fri May 17 20:19:04 2019] Temperature: 16.312°C
-[Fri May 17 20:24:05 2019] Temperature: 16.312°C
-[Fri May 17 20:29:06 2019] Temperature: 16.25°C
-[Fri May 17 20:34:07 2019] Temperature: 16.187°C
+[2019-12-30 18:52:38] 22.79 43.55 1022.39
+[2019-12-30 19:02:38] 22.83 43.27 1022.8
+[2019-12-30 19:12:38] 22.87 43.09 1022.8
+[2019-12-30 19:22:38] 22.9 43.17 1022.75
+[2019-12-30 19:32:38] 22.9 43.05 1022.89
+[2019-12-30 19:42:38] 22.94 42.83 1023.11
 ```
 
 It evolved to be quite good a slicing and dicing the log to produce data fron different intervals
