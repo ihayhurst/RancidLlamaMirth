@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import matplotlib as mpl
-mpl.use('Agg')
+# mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-from scipy.interpolate import make_interp_spline, BSpline
+from scipy.interpolate import UnivariateSpline
 import numpy as np
 import sys, argparse, re, datetime
 import config
@@ -29,10 +30,10 @@ def generateGraph(reading_count, area_name):
 def drawGraph(x,y,h,p, area_name):
     x2 = mdates.date2num(x)
     x_sm = np.array(x2)
-    x_smooth = np.linspace(x_sm.min(), x_sm.max(), 200)
-    spl = make_interp_spline(x2, y, k=3)
-    spl_h = make_interp_spline(x2, h, k=3)
-    spl_p = make_interp_spline(x2, p, k=3)
+    x_smooth = np.linspace(x_sm.min(), x_sm.max(), 150)
+    spl = UnivariateSpline(x2, y, k=3)
+    spl_h = UnivariateSpline(x2, h, k=3)
+    spl_p = UnivariateSpline(x2, p, k=3)
     y_smooth = spl(x_smooth)
     h_smooth = spl_h(x_smooth)
     p_smooth = spl_p(x_smooth)
