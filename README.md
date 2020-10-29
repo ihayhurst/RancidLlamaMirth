@@ -1,8 +1,8 @@
 # RancidLlamaMirth
 Python parse date log slice dice date range, graph data
-
-Graph.py was written to display a graph from a temperature log https://github.com/Dragon8oy/temp-report
-
+written to Graph data from a Date Time Humidity Pressure log in the form: 
+```[datetime], float, float, float``` 
+for example
 ```
 [2019-12-30 18:52:38] 22.79 43.55 1022.39
 [2019-12-30 19:02:38] 22.83 43.27 1022.8
@@ -11,9 +11,10 @@ Graph.py was written to display a graph from a temperature log https://github.co
 [2019-12-30 19:32:38] 22.9 43.05 1022.89
 [2019-12-30 19:42:38] 22.94 42.83 1023.11
 ```
-
 It evolved to be quite good a slicing and dicing the log to produce data fron different intervals
 or tailing the last [-l] number of lines of the log
+Works as a standalone utility to analyse the log data.
+```/graph.py --dur 1w``` to get a graph of the last week 
 
 python3 graph.py --help
 ```
