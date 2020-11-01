@@ -30,3 +30,4 @@ optional arguments:
   -e END, --end END     End date YYYY/MM/DD-HH:MM
   -d DUR, --dur DUR     Duration: Hours, Days, Weeks, e.g. 2W for 2 weeks
 ```
+![August 2020 data](https://github.com/ihayhurst/RancidLlamaMirth/blob/master/aug2020.png)
