@@ -15,6 +15,7 @@ LOG_DT_FORMAT = config.log_date_format
 area_name = config.area_name
 
 
+
 def generateGraph(reading_count, area_name):
     """Wrapper for drawgraph called from """
     kwargs = {"tailmode": True}
@@ -71,7 +72,9 @@ def drawGraph(x, y, h, p, area_name):
     ax.plot(x_smooth_dt, y_smooth, color=temperature_color, linewidth=1)
     hh.plot(x_smooth_dt, h_smooth, color=humidity_color, linewidth=1)
     pp.plot(x_smooth_dt, p_smooth, color=pressure_color, linewidth=1)
-    plt.title(str(area_name) + " Temperature, Humidity and Pressure logged by Pi")
+    pp.set_ylim([config.pressure_min, config.pressure_max])
+    hh.set_ylim([0, 100])
+    plt.title(f"{area_name} Temperature, Humidity and Pressure logged by Pi")
     plt.savefig("graph.png")
     print("Created graph\n")
     plt.clf()
