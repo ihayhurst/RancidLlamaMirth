@@ -1,4 +1,5 @@
 # RancidLlamaMirth
+Stand alone commandline parser for data logged by [Weather data logger](https://github.com/ihayhurst/TurgidLemonMeander)
 Python parse date log slice dice date range, graph data
 written to Graph data from a Date Time Humidity Pressure log in the form: 
 ```[datetime], float, float, float``` 
